@@ -5,7 +5,9 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
+import { Product } from '../../products/entities/product.entity';
 
 @Entity()
 export class User {
@@ -26,6 +28,12 @@ export class User {
 
   @Column({ select: false })
   password: string;
+
+  @OneToMany(() => Product, (product) => product.owner)
+  ownedProducts: Product[];
+
+  @OneToMany(() => Product, (product) => product.renter)
+  rentedProducts: Product[];
 
   @CreateDateColumn()
   createdAt: Date;
