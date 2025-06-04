@@ -8,6 +8,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { Product } from '../../products/entities/product.entity';
+import { Order } from '../../orders/entities/order.entity';
 
 @Entity()
 export class User {
@@ -34,6 +35,12 @@ export class User {
 
   @OneToMany(() => Product, (product) => product.renter)
   rentedProducts: Product[];
+
+  @OneToMany(() => Order, (order) => order.renter)
+  rentalOrders: Order[];
+
+  @OneToMany(() => Order, (order) => order.seller)
+  saleOrders: Order[];
 
   @CreateDateColumn()
   createdAt: Date;

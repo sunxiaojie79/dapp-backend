@@ -1,0 +1,208 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# NestJS + MySQL + TypeORM 后端开发提示词
+
+## 项目概述
+基于现有的 NFT 数字身份交易平台前端项目，开发对应的后端 API 服务。前端项目是一个移动端优先的 Value ID (数字身份) 交易平台，支持 NFT 买卖、租赁、用户管理、订单处理、财务管理等功能。
+
+## 技术栈要求
+- **框架**: NestJS (最新版本)
+- **数据库**: MySQL 8.0+
+- **ORM**: TypeORM
+- **语言**: TypeScript
+- **认证**: JWT
+- **文档**: Swagger/OpenAPI
+- **验证**: class-validator + class-transformer
+- **配置**: @nestjs/config
+- **其他**: 区块链集成支持 (Web3)
+
+## 核心功能模块
+
+### 1. 用户管理模块 (User Module)
+- 用户注册/登录 (支持钱包地址登录)
+- 用户资料管理 (头像、用户名等)
+- 钱包地址绑定和验证
+- 用户余额管理
+- 收藏夹管理
+
+### 2. NFT/Value ID 管理模块 (ValueID Module)
+- NFT 创建和铸造
+- NFT 元数据管理 (名称、描述、图片、属性等)
+- 稀有度系统 (common, uncommon, rare, epic, legendary)
+- NFT 所有权管理
+- NFT 上架/下架管理
+
+### 3. 交易模块 (Trading Module)
+- 购买订单处理
+- 销售订单管理
+- 价格管理
+- 支付地址和币种管理
+- 交易历史记录
+
+### 4. 租赁模块 (Rental Module)
+- NFT 租赁上架
+- 租赁订单处理
+- 租赁期限管理
+- 租赁价格设置
+- 租赁到期处理
+
+### 5. 订单管理模块 (Order Module)
+- 购买订单 (Buy Orders)
+- 销售订单 (Sell Orders)
+- 租赁订单 (Rental Orders)
+- 订单状态管理
+- 订单历史查询
+
+### 6. 财务模块 (Finance Module)
+- 用户钱包余额管理
+- 交易手续费计算
+- 收益分配
+- 财务报表
+- 提现管理
+
+### 7. 搜索和推荐模块 (Search Module)
+- NFT 搜索功能
+- 推荐算法 (基于稀有度、价格等)
+- 最新上架排序
+- 分类筛选
+
+## 数据库设计要求
+
+### 核心实体表
+1. **users** - 用户表
+2. **value_ids** - NFT/数字身份表
+3. **orders** - 订单表
+4. **transactions** - 交易记录表
+5. **rentals** - 租赁记录表
+6. **user_favorites** - 用户收藏表
+7. **nft_attributes** - NFT属性表
+8. **payment_methods** - 支付方式表
+
+### 关系设计
+- 用户与 NFT: 一对多关系 (所有权)
+- 用户与订单: 一对多关系
+- NFT 与属性: 一对多关系
+- 订单与交易: 一对多关系
+
+## API 接口设计要求
+
+### 用户相关接口
+```
+POST /api/auth/login - 用户登录
+POST /api/auth/register - 用户注册
+GET /api/users/profile - 获取用户资料
+PUT /api/users/profile - 更新用户资料
+GET /api/users/balance - 获取用户余额
+POST /api/users/favorites/:id - 添加收藏
+DELETE /api/users/favorites/:id - 取消收藏
+```
+
+### NFT 相关接口
+```
+GET /api/value-ids - 获取 NFT 列表 (支持分页、筛选、排序)
+GET /api/value-ids/:id - 获取 NFT 详情
+POST /api/value-ids - 创建 NFT
+PUT /api/value-ids/:id - 更新 NFT
+DELETE /api/value-ids/:id - 删除 NFT
+POST /api/value-ids/:id/list-for-sale - 上架销售
+POST /api/value-ids/:id/list-for-rent - 上架租赁
+```
+
+### 交易相关接口
+```
+POST /api/orders/buy - 创建购买订单
+POST /api/orders/sell - 创建销售订单
+POST /api/orders/rent - 创建租赁订单
+GET /api/orders - 获取订单列表
+GET /api/orders/:id - 获取订单详情
+PUT /api/orders/:id/status - 更新订单状态
+```
+
+### 搜索相关接口
+```
+GET /api/search/value-ids - 搜索 NFT
+GET /api/recommendations - 获取推荐 NFT
+GET /api/value-ids/latest - 获取最新 NFT
+```
+
+## 开发规范要求
+
+### 1. 项目结构
+```
+src/
+├── app.module.ts
+├── main.ts
+├── config/
+│   ├── database.config.ts
+│   └── jwt.config.ts
+├── modules/
+│   ├── auth/
+│   ├── users/
+│   ├── value-ids/
+│   ├── orders/
+│   ├── rentals/
+│   ├── finance/
+│   └── search/
+├── common/
+│   ├── decorators/
+│   ├── guards/
+│   ├── interceptors/
+│   ├── pipes/
+│   └── filters/
+├── entities/
+└── migrations/
+```
+
+### 2. 代码质量要求
+- 使用 ESLint + Prettier 格式化代码
+- 编写单元测试和集成测试
+- 添加 API 文档注释
+- 实现错误处理和日志记录
+- 添加请求验证和参数校验
+
+<!-- ### 3. 安全要求
+- 实现 JWT 认证
+- 添加 CORS 配置
+- 实现 Rate Limiting
+- 添加输入验证和 SQL 注入防护
+- 实现钱包地址签名验证
+
+### 4. 性能要求
+- 数据库查询优化
+- 实现缓存机制 (Redis)
+- 添加数据库索引
+- 实现分页查询
+- 优化大数据量查询
+
+## 环境配置
+```env
+# Database
+DATABASE_HOST=localhost
+DATABASE_PORT=3306
+DATABASE_USERNAME=root
+DATABASE_PASSWORD=password
+DATABASE_NAME=qf_dapp
+
+# JWT
+JWT_SECRET=your-secret-key
+JWT_EXPIRES_IN=7d
+
+# Redis (可选)
+REDIS_HOST=localhost
+REDIS_PORT=6379
+
+# Blockchain (如需要)
+WEB3_PROVIDER_URL=
+CONTRACT_ADDRESS=
+```
+
+## 部署要求
+- 支持 Docker 容器化部署
+- 提供 docker-compose.yml 配置
+- 配置数据库迁移脚本
+- 提供 PM2 进程管理配置
+- 添加健康检查接口 -->
+
