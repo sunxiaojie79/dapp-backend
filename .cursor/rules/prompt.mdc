@@ -138,14 +138,13 @@ src/
 ├── config/
 │   ├── database.config.ts
 │   └── jwt.config.ts
-├── modules/
-│   ├── auth/
-│   ├── users/
-│   ├── value-ids/
-│   ├── orders/
-│   ├── rentals/
-│   ├── finance/
-│   └── search/
+├── auth/
+├── users/
+├── value-ids/
+├── orders/
+├── rentals/
+├── finance/
+├── search/
 ├── common/
 │   ├── decorators/
 │   ├── guards/

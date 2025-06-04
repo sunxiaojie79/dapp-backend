@@ -9,8 +9,10 @@ import {
 } from 'typeorm';
 import { Product } from '../../products/entities/product.entity';
 import { Order } from '../../orders/entities/order.entity';
+import { ValueID } from '../../value-ids/entities/value-id.entity';
+import { UserFavorite } from '../../modules/common/entities/user-favorite.entity';
 
-@Entity()
+@Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
@@ -21,10 +23,10 @@ export class User {
   @Column()
   username: string;
 
-  @Column()
+  @Column({ default: '' })
   avatar: string;
 
-  @Column({ default: 0 })
+  @Column('decimal', { precision: 20, scale: 8, default: 0 })
   balance: number;
 
   @Column({ select: false })
@@ -36,11 +38,23 @@ export class User {
   @OneToMany(() => Product, (product) => product.renter)
   rentedProducts: Product[];
 
+  @OneToMany(() => ValueID, (valueID) => valueID.owner)
+  ownedValueIDs: ValueID[];
+
+  @OneToMany(() => ValueID, (valueID) => valueID.renter)
+  rentedValueIDs: ValueID[];
+
+  @OneToMany(() => Order, (order) => order.buyer)
+  buyOrders: Order[];
+
+  @OneToMany(() => Order, (order) => order.seller)
+  sellOrders: Order[];
+
   @OneToMany(() => Order, (order) => order.renter)
   rentalOrders: Order[];
 
-  @OneToMany(() => Order, (order) => order.seller)
-  saleOrders: Order[];
+  @OneToMany(() => UserFavorite, (favorite) => favorite.user)
+  favorites: UserFavorite[];
 
   @CreateDateColumn()
   createdAt: Date;
