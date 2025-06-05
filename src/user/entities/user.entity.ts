@@ -10,7 +10,7 @@ import {
 import { Product } from '../../products/entities/product.entity';
 import { Order } from '../../orders/entities/order.entity';
 import { ValueID } from '../../value-ids/entities/value-id.entity';
-import { UserFavorite } from '../../modules/common/entities/user-favorite.entity';
+import { UserFavorite } from '../../common/entities/user-favorite.entity';
 
 @Entity('users')
 export class User {

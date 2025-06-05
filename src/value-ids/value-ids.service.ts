@@ -1,10 +1,19 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { ValueID } from './entities/value-id.entity';
 import { NFTAttribute } from './entities/nft-attribute.entity';
-import { UserFavorite } from '../modules/common/entities/user-favorite.entity';
-import { CreateValueIDDto, UpdateValueIDDto, ListForSaleDto, ListForRentDto } from './dto/create-value-id.dto';
+import { UserFavorite } from '../common/entities/user-favorite.entity';
+import {
+  CreateValueIDDto,
+  UpdateValueIDDto,
+  ListForSaleDto,
+  ListForRentDto,
+} from './dto/create-value-id.dto';
 import { QueryValueIDsDto } from './dto/query-value-id.dto';
 
 @Injectable()
@@ -18,24 +27,25 @@ export class ValueIDsService {
     private userFavoriteRepository: Repository<UserFavorite>,
   ) {}
 
-  async create(createValueIDDto: CreateValueIDDto, ownerId: number): Promise<ValueID> {
+  async create(
+    createValueIDDto: CreateValueIDDto,
+    ownerId: number,
+  ): Promise<ValueID> {
     const { attributes, ...valueIDData } = createValueIDDto;
-    
     // 创建ValueID
     const valueID = this.valueIDRepository.create({
       ...valueIDData,
       ownerId,
     });
-    
     const savedValueID = await this.valueIDRepository.save(valueID);
 
     // 创建属性
     if (attributes && attributes.length > 0) {
-      const nftAttributes = attributes.map(attr => 
+      const nftAttributes = attributes.map((attr) =>
         this.nftAttributeRepository.create({
           ...attr,
           valueIdId: savedValueID.id,
-        })
+        }),
       );
       await this.nftAttributeRepository.save(nftAttributes);
     }
@@ -43,8 +53,16 @@ export class ValueIDsService {
     return this.findOne(savedValueID.id);
   }
 
-  async findAll(query: QueryValueIDsDto): Promise<{ data: ValueID[]; total: number; page: number; limit: number }> {
-    const { page = 1, limit = 10, sortBy = 'createdAt', sortOrder = 'DESC', ...filters } = query;
+  async findAll(
+    query: QueryValueIDsDto,
+  ): Promise<{ data: ValueID[]; total: number; page: number; limit: number }> {
+    const {
+      page = 1,
+      limit = 10,
+      sortBy = 'createdAt',
+      sortOrder = 'DESC',
+      ...filters
+    } = query;
     const skip = (page - 1) * limit;
 
     const queryBuilder = this.valueIDRepository
@@ -88,7 +106,11 @@ export class ValueIDsService {
     return valueID;
   }
 
-  async update(id: number, updateValueIDDto: UpdateValueIDDto, userId: number): Promise<ValueID> {
+  async update(
+    id: number,
+    updateValueIDDto: UpdateValueIDDto,
+    userId: number,
+  ): Promise<ValueID> {
     const valueID = await this.findOne(id);
 
     if (valueID.ownerId !== userId) {
@@ -111,7 +133,11 @@ export class ValueIDsService {
     await this.valueIDRepository.remove(valueID);
   }
 
-  async listForSale(id: number, listForSaleDto: ListForSaleDto, userId: number): Promise<ValueID> {
+  async listForSale(
+    id: number,
+    listForSaleDto: ListForSaleDto,
+    userId: number,
+  ): Promise<ValueID> {
     const valueID = await this.findOne(id);
 
     if (valueID.ownerId !== userId) {
@@ -127,7 +153,11 @@ export class ValueIDsService {
     return this.findOne(id);
   }
 
-  async listForRent(id: number, listForRentDto: ListForRentDto, userId: number): Promise<ValueID> {
+  async listForRent(
+    id: number,
+    listForRentDto: ListForRentDto,
+    userId: number,
+  ): Promise<ValueID> {
     const valueID = await this.findOne(id);
 
     if (valueID.ownerId !== userId) {
@@ -182,7 +212,11 @@ export class ValueIDsService {
     });
 
     await this.userFavoriteRepository.save(favorite);
-    await this.valueIDRepository.increment({ id: valueIdId }, 'favoriteCount', 1);
+    await this.valueIDRepository.increment(
+      { id: valueIdId },
+      'favoriteCount',
+      1,
+    );
   }
 
   async removeFromFavorites(valueIdId: number, userId: number): Promise<void> {
@@ -195,7 +229,11 @@ export class ValueIDsService {
     }
 
     await this.userFavoriteRepository.remove(favorite);
-    await this.valueIDRepository.decrement({ id: valueIdId }, 'favoriteCount', 1);
+    await this.valueIDRepository.decrement(
+      { id: valueIdId },
+      'favoriteCount',
+      1,
+    );
   }
 
   async getRecommendations(limit: number = 10): Promise<ValueID[]> {
@@ -220,33 +258,50 @@ export class ValueIDsService {
       .getMany();
   }
 
-  private applyFilters(queryBuilder: SelectQueryBuilder<ValueID>, filters: any): void {
+  private applyFilters(
+    queryBuilder: SelectQueryBuilder<ValueID>,
+    filters: any,
+  ): void {
     if (filters.name) {
-      queryBuilder.andWhere('valueID.name LIKE :name', { name: `%${filters.name}%` });
+      queryBuilder.andWhere('valueID.name LIKE :name', {
+        name: `%${filters.name}%`,
+      });
     }
 
     if (filters.rarity) {
-      queryBuilder.andWhere('valueID.rarity = :rarity', { rarity: filters.rarity });
+      queryBuilder.andWhere('valueID.rarity = :rarity', {
+        rarity: filters.rarity,
+      });
     }
 
     if (filters.isForSale !== undefined) {
-      queryBuilder.andWhere('valueID.isForSale = :isForSale', { isForSale: filters.isForSale });
+      queryBuilder.andWhere('valueID.isForSale = :isForSale', {
+        isForSale: filters.isForSale,
+      });
     }
 
     if (filters.isForRent !== undefined) {
-      queryBuilder.andWhere('valueID.isForRent = :isForRent', { isForRent: filters.isForRent });
+      queryBuilder.andWhere('valueID.isForRent = :isForRent', {
+        isForRent: filters.isForRent,
+      });
     }
 
     if (filters.ownerId) {
-      queryBuilder.andWhere('valueID.ownerId = :ownerId', { ownerId: filters.ownerId });
+      queryBuilder.andWhere('valueID.ownerId = :ownerId', {
+        ownerId: filters.ownerId,
+      });
     }
 
     if (filters.minPrice !== undefined) {
-      queryBuilder.andWhere('valueID.price >= :minPrice', { minPrice: filters.minPrice });
+      queryBuilder.andWhere('valueID.price >= :minPrice', {
+        minPrice: filters.minPrice,
+      });
     }
 
     if (filters.maxPrice !== undefined) {
-      queryBuilder.andWhere('valueID.price <= :maxPrice', { maxPrice: filters.maxPrice });
+      queryBuilder.andWhere('valueID.price <= :maxPrice', {
+        maxPrice: filters.maxPrice,
+      });
     }
   }
-} 
+}

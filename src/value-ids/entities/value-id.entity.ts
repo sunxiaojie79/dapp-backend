@@ -8,8 +8,8 @@ import {
   UpdateDateColumn,
   JoinColumn,
 } from 'typeorm';
-import { User } from '../../../user/entities/user.entity';
-import { Order } from '../../../orders/entities/order.entity';
+import { User } from '../../user/entities/user.entity';
+import { Order } from '../../orders/entities/order.entity';
 import { UserFavorite } from '../../common/entities/user-favorite.entity';
 import { NFTAttribute } from './nft-attribute.entity';
 

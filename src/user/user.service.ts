@@ -45,9 +45,18 @@ export class UserService {
   }
 
   async findByAddress(address: string): Promise<User> {
-    const user = await this.userRepository.findOne({ 
+    const user = await this.userRepository.findOne({
       where: { address },
-      select: ['id', 'address', 'username', 'avatar', 'balance', 'password', 'createdAt', 'updatedAt']
+      select: [
+        'id',
+        'address',
+        'username',
+        'avatar',
+        'balance',
+        'password',
+        'createdAt',
+        'updatedAt',
+      ],
     });
     if (!user) {
       throw new NotFoundException('User not found');

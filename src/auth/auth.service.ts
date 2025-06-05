@@ -67,7 +67,7 @@ export class AuthService {
       address: registerDto.address,
       username: registerDto.username,
       password: registerDto.password,
-      avatar: registerDto.avatar || '',
+      // avatar: registerDto.avatar || '',
     });
 
     const payload = {

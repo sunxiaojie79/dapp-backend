@@ -1,22 +1,27 @@
 import { Injectable } from '@nestjs/common';
-import { ValueIDsService } from '../../value-ids/value-ids.service';
+import { ValueIDsService } from '../value-ids/value-ids.service';
 import { SearchDto } from './dto/search.dto';
-import { ValueID } from '../../value-ids/entities/value-id.entity';
+import { ValueID } from '../value-ids/entities/value-id.entity';
+import { QueryValueIDsDto } from '../value-ids/dto/query-value-id.dto';
 
 @Injectable()
 export class SearchService {
   constructor(private readonly valueIDsService: ValueIDsService) {}
 
-  async search(searchDto: SearchDto): Promise<{ data: ValueID[]; total: number; page: number; limit: number }> {
+  async search(searchDto: SearchDto): Promise<{
+    data: ValueID[];
+    total: number;
+    page: number;
+    limit: number;
+  }> {
     const { q, ...filters } = searchDto;
-    
     // 将搜索关键词映射到name过滤器
     const queryFilters = {
       ...filters,
       ...(q && { name: q }),
     };
 
-    return this.valueIDsService.findAll(queryFilters);
+    return this.valueIDsService.findAll(queryFilters as QueryValueIDsDto);
   }
 
   async getRecommendations(limit: number = 10): Promise<ValueID[]> {
@@ -31,4 +36,4 @@ export class SearchService {
     // 获取热门的NFT（基于浏览量和收藏量）
     return this.valueIDsService.getRecommendations(limit);
   }
-} 
+}
