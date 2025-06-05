@@ -1,19 +1,37 @@
 import { registerAs } from '@nestjs/config';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
+import * as fs from 'fs';
+import * as dotenv from 'dotenv';
+
+function getEnv(env: string): Record<string, unknown> {
+  if (fs.existsSync(env)) {
+    return dotenv.parse(fs.readFileSync(env));
+  }
+  return {};
+}
+
+function buildConnectionOptions() {
+  const defaultConfig = getEnv('.env');
+  const envConfig = getEnv(`.env.${process.env.NODE_ENV || 'development'}`);
+
+  const config = {
+    ...defaultConfig,
+    ...envConfig,
+  };
+
+  return {
+    type: 'mysql',
+    host: config.DB_HOST,
+    port: config.DB_PORT,
+    username: config.DB_USERNAME,
+    password: config.DB_PASSWORD,
+    database: config.DB_DATABASE,
+    entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+    synchronize: config.DB_SYNC === 'true',
+  } as TypeOrmModuleOptions;
+}
 
 export default registerAs(
   'database',
-  (): TypeOrmModuleOptions => ({
-    type: 'mysql',
-    host: process.env.DB_HOST || 'localhost',
-    port: parseInt(process.env.DB_PORT) || 3306,
-    username: process.env.DB_USERNAME || 'root',
-    password: process.env.DB_PASSWORD || 'example',
-    database: process.env.DB_DATABASE || 'dapp',
-    entities: [__dirname + '/../**/*.entity{.ts,.js}'],
-    migrations: [__dirname + '/../migrations/*{.ts,.js}'],
-    synchronize: process.env.DB_SYNC === 'true' || false,
-    logging: process.env.NODE_ENV === 'development',
-    timezone: '+08:00',
-  }),
+  (): TypeOrmModuleOptions => buildConnectionOptions(),
 );
