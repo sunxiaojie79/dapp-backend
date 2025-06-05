@@ -65,12 +65,9 @@ src/
 │   ├── filters/                # 异常过滤器
 │   ├── guards/                 # 守卫
 │   └── interceptors/           # 拦截器
-├── modules/                     # 业务模块
-│   ├── auth/                   # 认证模块
-│   ├── value-ids/             # NFT/Value ID 模块
-│   ├── search/                # 搜索模块
-│   └── common/                # 公共模块
-│       └── entities/          # 公共实体
+├── auth/                   # 认证模块
+├── value-ids/             # NFT/Value ID 模块
+├── search/                # 搜索模块
 ├── user/                       # 用户模块
 └── orders/                     # 订单模块
 ```
