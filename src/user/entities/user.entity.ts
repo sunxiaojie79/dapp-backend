@@ -7,7 +7,6 @@ import {
   UpdateDateColumn,
   OneToMany,
 } from 'typeorm';
-import { Product } from '../../products/entities/product.entity';
 import { Order } from '../../orders/entities/order.entity';
 import { ValueID } from '../../value-ids/entities/value-id.entity';
 import { UserFavorite } from '../../common/entities/user-favorite.entity';
@@ -31,12 +30,6 @@ export class User {
 
   @Column({ select: false })
   password: string;
-
-  @OneToMany(() => Product, (product) => product.owner)
-  ownedProducts: Product[];
-
-  @OneToMany(() => Product, (product) => product.renter)
-  rentedProducts: Product[];
 
   @OneToMany(() => ValueID, (valueID) => valueID.owner)
   ownedValueIDs: ValueID[];
