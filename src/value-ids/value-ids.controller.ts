@@ -12,7 +12,12 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { ValueIDsService } from './value-ids.service';
-import { CreateValueIDDto, UpdateValueIDDto, ListForSaleDto, ListForRentDto } from './dto/create-value-id.dto';
+import {
+  CreateValueIDDto,
+  UpdateValueIDDto,
+  ListForSaleDto,
+  ListForRentDto,
+} from './dto/create-value-id.dto';
 import { QueryValueIDsDto } from './dto/query-value-id.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';

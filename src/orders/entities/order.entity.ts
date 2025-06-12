@@ -3,12 +3,14 @@ import {
   Column,
   PrimaryGeneratedColumn,
   ManyToOne,
+  OneToMany,
   CreateDateColumn,
   UpdateDateColumn,
   JoinColumn,
 } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 import { ValueID } from '../../value-ids/entities/value-id.entity';
+import { Transaction } from '../../transactions/entities/transaction.entity';
 
 export enum OrderType {
   BUY = 'buy',
@@ -87,6 +89,9 @@ export class Order {
 
   @CreateDateColumn()
   createdAt: Date;
+
+  @OneToMany(() => Transaction, (transaction) => transaction.order)
+  transactions: Transaction[];
 
   @UpdateDateColumn()
   updatedAt: Date;

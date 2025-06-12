@@ -10,6 +10,9 @@ import {
 import { Order } from '../../orders/entities/order.entity';
 import { ValueID } from '../../value-ids/entities/value-id.entity';
 import { UserFavorite } from '../../common/entities/user-favorite.entity';
+import { Transaction } from '../../transactions/entities/transaction.entity';
+import { FinancialRecord } from '../../finance/entities/financial-record.entity';
+import { Wallet } from '../../finance/entities/wallet.entity';
 
 @Entity('users')
 export class User {
@@ -48,6 +51,18 @@ export class User {
 
   @OneToMany(() => UserFavorite, (favorite) => favorite.user)
   favorites: UserFavorite[];
+
+  @OneToMany(() => Transaction, (transaction) => transaction.buyer)
+  buyTransactions: Transaction[];
+
+  @OneToMany(() => Transaction, (transaction) => transaction.seller)
+  sellTransactions: Transaction[];
+
+  @OneToMany(() => FinancialRecord, (record) => record.user)
+  financialRecords: FinancialRecord[];
+
+  @OneToMany(() => Wallet, (wallet) => wallet.user)
+  wallets: Wallet[];
 
   @CreateDateColumn()
   createdAt: Date;

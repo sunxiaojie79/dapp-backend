@@ -6,6 +6,8 @@ import { OrdersModule } from './orders/orders.module';
 import { AuthModule } from './auth/auth.module';
 import { ValueIDsModule } from './value-ids/value-ids.module';
 import { SearchModule } from './search/search.module';
+import { TransactionsModule } from './transactions/transactions.module';
+import { FinanceModule } from './finance/finance.module';
 
 // 配置文件
 import databaseConfig from './config/database.config';
@@ -30,6 +32,8 @@ import appConfig from './config/app.config';
     OrdersModule,
     ValueIDsModule,
     SearchModule,
+    TransactionsModule,
+    FinanceModule,
   ],
   controllers: [],
   providers: [],

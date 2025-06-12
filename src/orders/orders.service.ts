@@ -13,6 +13,8 @@ import {
   UpdateOrderDto,
   QueryOrdersDto,
 } from './dto/create-order.dto';
+import { TransactionsService } from '../transactions/transactions.service';
+import { TransactionType } from '../transactions/entities/transaction.entity';
 
 @Injectable()
 export class OrdersService {
@@ -21,6 +23,7 @@ export class OrdersService {
     private orderRepository: Repository<Order>,
     @InjectRepository(ValueID)
     private valueIDRepository: Repository<ValueID>,
+    private transactionsService: TransactionsService,
   ) {}
 
   async create(createOrderDto: CreateOrderDto, userId: number): Promise<Order> {
@@ -202,6 +205,35 @@ export class OrdersService {
     if (order.status !== OrderStatus.PENDING) {
       throw new ForbiddenException('只能完成待处理状态的订单');
     }
+
+    // 计算平台手续费 (假设2.5%)
+    const feeRate = 0.025;
+    const fee = order.amount * feeRate;
+
+    // 创建交易记录
+    const transactionType =
+      order.type === OrderType.BUY
+        ? TransactionType.PURCHASE
+        : order.type === OrderType.RENT
+          ? TransactionType.RENTAL
+          : TransactionType.SALE;
+
+    const transaction = await this.transactionsService.create({
+      transactionHash: `order_${order.id}_${Date.now()}`,
+      type: transactionType,
+      amount: order.amount,
+      fee,
+      currency: order.currency,
+      fromAddress: `user_${order.buyerId || order.renterId}`,
+      toAddress: `user_${order.sellerId}`,
+      valueIdId: order.valueIdId,
+      buyerId: order.buyerId || order.renterId,
+      sellerId: order.sellerId,
+      orderId: order.id,
+    });
+
+    // 确认交易
+    await this.transactionsService.confirmTransaction(transaction.id);
 
     order.status = OrderStatus.COMPLETED;
 
