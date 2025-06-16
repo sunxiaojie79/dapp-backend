@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UserProfileResponseDto } from './dto/user-profile-response.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
@@ -64,6 +65,80 @@ export class UserService {
     return user;
   }
 
+  async findOneWithRelations(id: number): Promise<User> {
+    const user = await this.userRepository.findOne({
+      where: { id },
+      relations: [
+        'ownedValueIDs',
+        'rentedValueIDs',
+        'buyOrders',
+        'sellOrders',
+        'rentalOrders',
+        'favorites',
+        'favorites.valueID',
+        'buyTransactions',
+        'sellTransactions',
+        'financialRecords',
+        'wallets',
+      ],
+    });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return user;
+  }
+
+  async findByAddressWithRelations(address: string): Promise<User> {
+    const user = await this.userRepository.findOne({
+      where: { address },
+      relations: [
+        'ownedValueIDs',
+        'rentedValueIDs',
+        'buyOrders',
+        'sellOrders',
+        'rentalOrders',
+        'favorites',
+        'favorites.valueID',
+        'buyTransactions',
+        'sellTransactions',
+        'financialRecords',
+        'wallets',
+      ],
+    });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return user;
+  }
+
+  async findOneWithSelectedRelations(
+    id: number,
+    relations?: string[],
+  ): Promise<User> {
+    const defaultRelations = [
+      'ownedValueIDs',
+      'rentedValueIDs',
+      'buyOrders',
+      'sellOrders',
+      'rentalOrders',
+      'favorites',
+      'favorites.valueID',
+      'buyTransactions',
+      'sellTransactions',
+      'financialRecords',
+      'wallets',
+    ];
+
+    const user = await this.userRepository.findOne({
+      where: { id },
+      relations: relations || defaultRelations,
+    });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return user;
+  }
+
   async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
     const user = await this.userRepository.findOne({ where: { id } });
     if (!user) {
@@ -85,5 +160,19 @@ export class UserService {
     const user = await this.findOne(id);
     user.balance = balance;
     return this.userRepository.save(user);
+  }
+
+  async getUserProfileWithRelations(
+    id: number,
+  ): Promise<UserProfileResponseDto> {
+    const user = await this.findOneWithRelations(id);
+    return new UserProfileResponseDto(user);
+  }
+
+  async getUserProfileByAddressWithRelations(
+    address: string,
+  ): Promise<UserProfileResponseDto> {
+    const user = await this.findByAddressWithRelations(address);
+    return new UserProfileResponseDto(user);
   }
 }
